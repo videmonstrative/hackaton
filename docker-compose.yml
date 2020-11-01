@@ -1,0 +1,52 @@
+version: '3.3'
+
+services:
+  nginx:
+    build: .docker/nginx
+    container_name: ava-cmf-nginx
+    volumes:
+      - .docker/nginx/src/etc/nginx/conf.d:/etc/nginx/conf.d
+    ports:
+    - 8888:80
+    depends_on:
+      - vue
+      - express
+
+  vue:
+    build: .docker/vue
+    container_name: ava-cmf-vue
+    #environment:
+    #  - HOST=0:0:0:0
+    volumes:
+      - ./vue:/app
+    command: npm run serve
+
+  express:
+    build: .docker/express
+    container_name: ava-cmf-express
+    volumes:
+      - ./express:/app
+    command: npm run start
+
+  checker:
+    build: .docker/checker
+    container_name: ava-cmf-checker
+    privileged: true
+    volumes:
+      - ./checker:/app
+    command: npm run start
+
+  mongodb:
+    build: .docker/mongodb
+    container_name: ava-cmf-mongodb
+    ports:
+    - 27017:27017
+
+  redis:
+    build: .docker/redis
+    container_name: ava-cmf-redis
+
+
+networks:
+  default:
+    driver: bridge
